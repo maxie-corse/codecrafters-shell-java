@@ -89,8 +89,6 @@ public class Main {
                     processArgs.add(token);
                 }
 
-                processArgs.set(0, executablePath);
-
                 ProcessBuilder pb = new ProcessBuilder(processArgs);
 
                 pb.inheritIO();
