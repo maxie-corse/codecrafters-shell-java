@@ -8,11 +8,13 @@ import java.nio.file.Path;
 // run external programs
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class Main {
 
     static boolean isBuiltin(String command) {
-        return command.equals("exit") || command.equals("echo") || command.equals("type");
+        Set<String> builtins = Set.of("exit", "echo", "type", "pwd");
+        return builtins.contains(command);
     }
 
     static String findExecutable(String command) {
