@@ -1,8 +1,13 @@
 import java.util.Scanner;
 
+// locate executable files
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+// run external programs
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
 
@@ -35,10 +40,19 @@ public class Main {
             System.out.print("$ ");
 
             String input = sc.nextLine();
-            int spaceIndex = input.indexOf(' ');
 
-            String command = (spaceIndex == -1)? input : input.substring(0, spaceIndex);
-            String arguments = (spaceIndex == -1)? "" : input.substring(spaceIndex + 1);
+            if (input.trim().isEmpty()) continue;
+
+            String[] tokens = input.trim().split("\\s+");
+
+            String command = tokens[0];
+
+            StringBuilder params = new StringBuilder();
+            for (int i = 1; i < tokens.length; i++) {
+                if (i > 1) params.append(" ");
+                params.append(tokens[i]);
+            }
+            String arguments = params.toString();
 
             if (command.equals("exit")) {
                 break;
@@ -62,7 +76,28 @@ public class Main {
                 }
             }
             else {
-                System.out.println(command + ": command not found");
+                String executablePath = findExecutable(command);
+
+                if (executablePath.isEmpty()) {
+                    System.out.println(command + ": command not found");
+                    continue;
+                }
+                
+                List<String> processArgs = new ArrayList<>();
+
+                for (String token : tokens) {
+                    processArgs.add(token);
+                }
+
+                processArgs.set(0, executablePath);
+
+                ProcessBuilder pb = new ProcessBuilder(processArgs);
+
+                pb.inheritIO();
+
+                Process process = pb.start();
+
+                process.waitFor();
             }
         }
 
