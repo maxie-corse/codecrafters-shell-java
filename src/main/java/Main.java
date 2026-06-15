@@ -75,6 +75,9 @@ public class Main {
                     }
                 }
             }
+            else if (command.equals("pwd")) {
+                System.out.println(Path.of("").toAbsolutePath());
+            }
             else {
                 String executablePath = findExecutable(command);
 
