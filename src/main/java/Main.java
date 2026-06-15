@@ -5,7 +5,7 @@ public class Main {
         Scanner sc = new Scanner(System.in);
 
         String input, command, arguments;
-        
+
         while (true) {
             System.out.print("$ ");
 
@@ -26,6 +26,14 @@ public class Main {
             }
             else if (command.equals("echo")) {
                 System.out.println(arguments);
+            }
+            else if (command.equals("type")) {
+                if (arguments.equals("exit") || arguments.equals("echo") || arguments.equals("type")) {
+                    System.out.println(arguments + " is a shell builtin");
+                }
+                else {
+                    System.out.println(arguments + ": not found");
+                }
             }
             else {
                 System.out.println(command + ": command not found");
