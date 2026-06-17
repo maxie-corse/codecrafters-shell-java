@@ -86,6 +86,24 @@ public class Main {
                     if (c == '"') {
                         state = State.NORMAL;
                     }
+                    else if (c == '\\') {
+
+                        if (i + 1 < input.length()) {
+
+                            char next = input.charAt(i + 1);
+
+                            if (next == '"' || next == '\\') {
+                                current.append(next);
+                                i++;
+                            }
+                            else {
+                                current.append('\\');
+                            }
+                        }
+                        else {
+                            current.append('\\');
+                        }
+                    }
                     else {
                         current.append(c);
                     }
