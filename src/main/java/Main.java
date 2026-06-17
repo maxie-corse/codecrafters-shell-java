@@ -86,7 +86,10 @@ public class Main {
             else if (command.equals("cd")) {
                 if (tokens.length < 2) continue;
 
-                if (Path.of(tokens[1]).isAbsolute()) {
+                if (tokens[1].equals("~")) {
+                    newDirectory = Path.of(System.getenv("HOME"));
+                }
+                else if (Path.of(tokens[1]).isAbsolute()) {
                     newDirectory = Path.of(tokens[1]);
                 }
                 else {
