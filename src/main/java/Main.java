@@ -1,5 +1,4 @@
 import java.util.Scanner;
-
 // locate executable files
 import java.io.File;
 import java.nio.file.Files;
@@ -11,6 +10,12 @@ import java.util.List;
 import java.util.Set;
 
 public class Main {
+
+    enum State {
+        NORMAL,
+        SINGLE_QUOTE,
+        DOUBLE_QUOTE
+    }
 
     private static final Set<String> BUILTINS = Set.of("exit", "echo", "type", "pwd", "cd");
 
@@ -36,6 +41,65 @@ public class Main {
         return "";
     }
 
+    static List<String> tokenize(String input) {
+        List<String> tokens = new ArrayList<>();
+
+        StringBuilder current = new StringBuilder();
+
+        State state = State.NORMAL;
+
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+
+            switch (state) {
+                case NORMAL:
+                    if (Character.isWhitespace(c)) {
+                        if (current.length() > 0) {
+                            tokens.add(current.toString());
+                            current.setLength(0);
+                        }
+                    }
+                    else if (c == '\'') {
+                        state = State.SINGLE_QUOTE;
+                    }
+                    else if (c == '"') {
+                        state = State.DOUBLE_QUOTE;
+                    }
+                    else if (c == '\\') {
+                        if (i + 1 < input.length()) {
+                            current.append(input.charAt(++i));
+                        }
+                    }
+                    else {
+                        current.append(c);
+                    }
+                    break;
+                case SINGLE_QUOTE:
+                    if (c == '\'') {
+                        state = State.NORMAL;
+                    }
+                    else {
+                        current.append(c);
+                    }
+                    break;
+                case DOUBLE_QUOTE:
+                    if (c == '"') {
+                        state = State.NORMAL;
+                    }
+                    else {
+                        current.append(c);
+                    }
+                    break;
+            }
+        }
+
+        if (current.length() > 0) {
+            tokens.add(current.toString());
+        }
+
+        return tokens;
+    }
+
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
 
@@ -48,24 +112,26 @@ public class Main {
 
             if (input.trim().isEmpty()) continue;
 
-            String[] tokens = input.trim().split("\\s+");
+            List<String> tokens = tokenize(input);
 
-            String command = tokens[0];
+            if (tokens.isEmpty()) continue;
+
+            String command = tokens.get(0);
 
             if (command.equals("exit")) {
                 break;
             }
             else if (command.equals("echo")) {
-                for (int i = 1; i < tokens.length; i++) {
+                for (int i = 1; i < tokens.size(); i++) {
                     if (i > 1) {
                         System.out.print(" ");
                     }
-                    System.out.print(tokens[i]);
+                    System.out.print(tokens.get(i));
                 }
                 System.out.println();
             }
             else if (command.equals("type")) {
-                String target = tokens.length > 1 ? tokens[1] : "";
+                String target = tokens.size() > 1 ? tokens.get(1) : "";
                 if (isBuiltin(target)) {
                     System.out.println(target + " is a shell builtin");
                 }
@@ -84,16 +150,16 @@ public class Main {
                 System.out.println(currentDirectory);
             }
             else if (command.equals("cd")) {
-                if (tokens.length < 2) continue;
+                if (tokens.size() < 2) continue;
 
-                if (tokens[1].equals("~")) {
+                if (tokens.get(1).equals("~")) {
                     newDirectory = Path.of(System.getenv("HOME"));
                 }
-                else if (Path.of(tokens[1]).isAbsolute()) {
-                    newDirectory = Path.of(tokens[1]);
+                else if (Path.of(tokens.get(1)).isAbsolute()) {
+                    newDirectory = Path.of(tokens.get(1));
                 }
                 else {
-                    newDirectory = currentDirectory.resolve(tokens[1]);
+                    newDirectory = currentDirectory.resolve(tokens.get(1));
                 }
 
                 newDirectory = newDirectory.normalize();
@@ -102,7 +168,7 @@ public class Main {
                     currentDirectory = newDirectory.toAbsolutePath();
                 }
                 else {
-                    System.out.println("cd: " + tokens[1] + ": No such file or directory");
+                    System.out.println("cd: " + tokens.get(1) + ": No such file or directory");
                 }
             }
             else {
@@ -113,7 +179,7 @@ public class Main {
                     continue;
                 }
                 
-                List<String> processArgs = new ArrayList<>(List.of(tokens));
+                List<String> processArgs = new ArrayList<>(tokens);
 
                 ProcessBuilder pb = new ProcessBuilder(processArgs);
 
