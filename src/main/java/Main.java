@@ -86,7 +86,7 @@ public class Main {
             else if (command.equals("cd")) {
                 if (tokens.length < 2) continue;
 
-                if (Path.of(tokens[i]).isAbsolute()) {
+                if (Path.of(tokens[1]).isAbsolute()) {
                     newDirectory = Path.of(tokens[1]);
                 }
                 else {
