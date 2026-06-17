@@ -12,9 +12,10 @@ import java.util.Set;
 
 public class Main {
 
+    private static final Set<String> BUILTINS = Set.of("exit", "echo", "type", "pwd", "cd");
+
     static boolean isBuiltin(String command) {
-        Set<String> builtins = Set.of("exit", "echo", "type", "pwd");
-        return builtins.contains(command);
+        return BUILTINS.contains(command);
     }
 
     static String findExecutable(String command) {
@@ -38,6 +39,8 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
 
+        Path currentDirectory = Path.of(System.getProperty("user.dir")).toAbsolutePath();
+
         while (true) {
             System.out.print("$ ");
 
@@ -49,36 +52,48 @@ public class Main {
 
             String command = tokens[0];
 
-            StringBuilder params = new StringBuilder();
-            for (int i = 1; i < tokens.length; i++) {
-                if (i > 1) params.append(" ");
-                params.append(tokens[i]);
-            }
-            String arguments = params.toString();
-
             if (command.equals("exit")) {
                 break;
             }
             else if (command.equals("echo")) {
-                System.out.println(arguments);
+                for (int i = 1; i < tokens.length; i++) {
+                    if (i > 1) {
+                        System.out.print(" ");
+                    }
+                    System.out.print(tokens[i]);
+                }
+                System.out.println();
             }
             else if (command.equals("type")) {
-                if (isBuiltin(arguments)) {
-                    System.out.println(arguments + " is a shell builtin");
+                String target = tokens.length > 1 ? tokens[1] : "";
+                if (isBuiltin(target)) {
+                    System.out.println(target + " is a shell builtin");
                 }
                 else {
-                    String executablePath = findExecutable(arguments);
+                    String executablePath = findExecutable(target);
 
                     if (!executablePath.isEmpty()) {
-                        System.out.println(arguments + " is " + executablePath);
+                        System.out.println(target + " is " + executablePath);
                     }
                     else {
-                        System.out.println(arguments + ": not found");
+                        System.out.println(target + ": not found");
                     }
                 }
             }
             else if (command.equals("pwd")) {
-                System.out.println(Path.of("").toAbsolutePath());
+                System.out.println(currentDirectory);
+            }
+            else if (command.equals("cd")) {
+                if (tokens.length < 2) continue;
+
+                Path newDirectory = Path.of(tokens[1]);
+
+                if (Files.exists(newDirectory) && Files.isDirectory(newDirectory)) {
+                    currentDirectory = newDirectory.toAbsolutePath();
+                }
+                else {
+                    System.out.println("cd: " + tokens[1] + " No such file or directory");
+                }
             }
             else {
                 String executablePath = findExecutable(command);
@@ -88,11 +103,7 @@ public class Main {
                     continue;
                 }
                 
-                List<String> processArgs = new ArrayList<>();
-
-                for (String token : tokens) {
-                    processArgs.add(token);
-                }
+                List<String> processArgs = new ArrayList<>(List.of(tokens));
 
                 ProcessBuilder pb = new ProcessBuilder(processArgs);
 
