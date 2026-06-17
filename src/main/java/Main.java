@@ -92,7 +92,7 @@ public class Main {
                     currentDirectory = newDirectory.toAbsolutePath();
                 }
                 else {
-                    System.out.println("cd: " + tokens[1] + " No such file or directory");
+                    System.out.println("cd: " + tokens[1] + ": No such file or directory");
                 }
             }
             else {
