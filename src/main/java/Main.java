@@ -39,7 +39,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
 
-        Path currentDirectory = Path.of(System.getProperty("user.dir")).toAbsolutePath();
+        Path currentDirectory = Path.of(System.getProperty("user.dir")).toAbsolutePath(), newDirectory;
 
         while (true) {
             System.out.print("$ ");
@@ -86,7 +86,14 @@ public class Main {
             else if (command.equals("cd")) {
                 if (tokens.length < 2) continue;
 
-                Path newDirectory = Path.of(tokens[1]);
+                if (Path.of(tokens[i]).isAbsolute()) {
+                    newDirectory = Path.of(tokens[1]);
+                }
+                else {
+                    newDirectory = currentDirectory.resolve(tokens[1]);
+                }
+
+                newDirectory = newDirectory.normalize();
 
                 if (Files.exists(newDirectory) && Files.isDirectory(newDirectory)) {
                     currentDirectory = newDirectory.toAbsolutePath();
