@@ -47,8 +47,9 @@ public class Executor {
         Process process = pb.start();
 
         if (cmd.background) {
-            int jobNumber = JobManager.allocateJobNumber();
-            System.out.println("[" + jobNumber + "] " + process.pid());
+            JobManager.addJob(process, String.join(" ", cmd.args) + " &");
+
+            System.out.println("[" + (JobManager.getJobs().size()) + "] " + process.pid());
         }
         else {
             process.waitFor();
