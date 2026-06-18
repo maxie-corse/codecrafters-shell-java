@@ -112,9 +112,7 @@ public class Main {
                 }
             }
             else if (command.equals("jobs")) {
-                for (Job job : JobManager.getJobs()) {
-                    System.out.printf("[%d]+  %-24s%s%n", job.jobNumber, "Running", job.command);
-                }
+                JobManager.printJobs();
             }
             else {
                 String executablePath = PathResolver.findExecutable(command);
