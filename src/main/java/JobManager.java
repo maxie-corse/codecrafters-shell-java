@@ -15,8 +15,6 @@ public class JobManager {
     }
 
     public static void printJobs() {
-        int last = jobs.size() - 1;
-        int secondLast = jobs.size() - 2;
 
         for (int i = 0; i < jobs.size(); i++) {
             Job job = jobs.get(i);
@@ -30,7 +28,33 @@ public class JobManager {
                 marker = '-';
             }
 
-            System.out.printf("[%d]%c  %-24s%s%n", job.jobNumber, marker, "Running", job.command);
+            if (!isDone(job)) {
+                System.out.printf(
+                    "[%d]%c  %-24s%s%n",
+                    job.jobNumber,
+                    marker,
+                    "Running",
+                    job.command
+                );
+            }
+            else {
+
+                System.out.printf(
+                    "[%d]%c  %-24s%s%n",
+                    job.jobNumber,
+                    marker,
+                    "Done",
+                    job.command.replace(" &", "")
+                );
+
+                job.doneDisplayed = true;
+            }
         }
+
+        jobs.removeIf(job -> job.doneDisplayed);
+    }
+
+    public static boolean isDone(Job job) {
+        return !job.process.isAlive();
     }
 }
