@@ -57,136 +57,166 @@ public class Executor {
     }
 
     public static void executePipeline(ParsedCommand cmd) throws Exception {
-        List<String> left =
-            cmd.pipeline.get(0);
 
-        List<String> right =
-            cmd.pipeline.get(1);
+        List<ProcessBuilder> builders =
+            new ArrayList<>();
 
-        boolean leftBuiltin =
-            Builtins.isBuiltin(left.get(0));
+        for (List<String> command : cmd.pipeline) {
 
-        boolean rightBuiltin =
-            Builtins.isBuiltin(right.get(0));
+            List<String> processCommand = new ArrayList<>(command);
 
-        if (leftBuiltin) {
+            String executable = PathResolver.findExecutable(processCommand.get(0));
 
-            java.io.ByteArrayOutputStream buffer =
-                new java.io.ByteArrayOutputStream();
+            if (!executable.isEmpty()) {
+                processCommand.set(0, executable);
+            }
 
-            java.io.PrintStream pipeOut =
-                new java.io.PrintStream(buffer);
+            ProcessBuilder pb = new ProcessBuilder(processCommand);
 
-            BuiltinExecutor.execute(
-                left,
-                pipeOut
-            );
+            pb.redirectError(ProcessBuilder.Redirect.INHERIT);
 
-            pipeOut.close();
-
-            List<String> rightCommand =
-                new ArrayList<>(right);
-
-            rightCommand.set(
-                0,
-                PathResolver.findExecutable(
-                    rightCommand.get(0)
-                )
-            );
-
-            ProcessBuilder pb =
-                new ProcessBuilder(rightCommand);
-
-            Process process = pb.start();
-
-            process.getOutputStream().write(
-                buffer.toByteArray()
-            );
-
-            process.getOutputStream().close();
-
-            process.getInputStream()
-                .transferTo(System.out);
-
-            process.waitFor();
-
-            return;
+            builders.add(pb);
         }
-
-        if (rightBuiltin) {
-
-            List<String> leftCommand =
-                new ArrayList<>(left);
-
-            leftCommand.set(
-                0,
-                PathResolver.findExecutable(
-                    leftCommand.get(0)
-                )
-            );
-
-            ProcessBuilder pb =
-                new ProcessBuilder(leftCommand);
-
-            Process process = pb.start();
-
-            process.waitFor();
-
-            BuiltinExecutor.execute(
-                right,
-                System.out
-            );
-
-            return;
-        }
-
-        // existing external|external code
-
-        List<String> leftCommand =
-            new ArrayList<>(left);
-
-        List<String> rightCommand =
-            new ArrayList<>(right);
-
-        leftCommand.set(
-            0,
-            PathResolver.findExecutable(
-                leftCommand.get(0)
-            )
-        );
-
-        rightCommand.set(
-            0,
-            PathResolver.findExecutable(
-                rightCommand.get(0)
-            )
-        );
-
-        ProcessBuilder leftPB =
-            new ProcessBuilder(leftCommand);
-
-        ProcessBuilder rightPB =
-            new ProcessBuilder(rightCommand);
-
-        leftPB.redirectError(
-            ProcessBuilder.Redirect.INHERIT
-        );
-
-        rightPB.redirectError(
-            ProcessBuilder.Redirect.INHERIT
-        );
-
-        rightPB.redirectOutput(
-            ProcessBuilder.Redirect.INHERIT
-        );
 
         List<Process> processes =
-            ProcessBuilder.startPipeline(
-                List.of(leftPB, rightPB)
-            );
+            ProcessBuilder.startPipeline(builders);
 
-        processes.get(
-            processes.size() - 1
-        ).waitFor();
+        for (Process process : processes) {
+            process.waitFor();
+        }
     }
+
+    // public static void executePipeline(ParsedCommand cmd) throws Exception {
+    //     List<String> left =
+    //         cmd.pipeline.get(0);
+
+    //     List<String> right =
+    //         cmd.pipeline.get(1);
+
+    //     boolean leftBuiltin =
+    //         Builtins.isBuiltin(left.get(0));
+
+    //     boolean rightBuiltin =
+    //         Builtins.isBuiltin(right.get(0));
+
+    //     if (leftBuiltin) {
+
+    //         java.io.ByteArrayOutputStream buffer =
+    //             new java.io.ByteArrayOutputStream();
+
+    //         java.io.PrintStream pipeOut =
+    //             new java.io.PrintStream(buffer);
+
+    //         BuiltinExecutor.execute(
+    //             left,
+    //             pipeOut
+    //         );
+
+    //         pipeOut.close();
+
+    //         List<String> rightCommand =
+    //             new ArrayList<>(right);
+
+    //         rightCommand.set(
+    //             0,
+    //             PathResolver.findExecutable(
+    //                 rightCommand.get(0)
+    //             )
+    //         );
+
+    //         ProcessBuilder pb =
+    //             new ProcessBuilder(rightCommand);
+
+    //         Process process = pb.start();
+
+    //         process.getOutputStream().write(
+    //             buffer.toByteArray()
+    //         );
+
+    //         process.getOutputStream().close();
+
+    //         process.getInputStream()
+    //             .transferTo(System.out);
+
+    //         process.waitFor();
+
+    //         return;
+    //     }
+
+    //     if (rightBuiltin) {
+
+    //         List<String> leftCommand =
+    //             new ArrayList<>(left);
+
+    //         leftCommand.set(
+    //             0,
+    //             PathResolver.findExecutable(
+    //                 leftCommand.get(0)
+    //             )
+    //         );
+
+    //         ProcessBuilder pb =
+    //             new ProcessBuilder(leftCommand);
+
+    //         Process process = pb.start();
+
+    //         process.waitFor();
+
+    //         BuiltinExecutor.execute(
+    //             right,
+    //             System.out
+    //         );
+
+    //         return;
+    //     }
+
+    //     // existing external|external code
+
+    //     List<String> leftCommand =
+    //         new ArrayList<>(left);
+
+    //     List<String> rightCommand =
+    //         new ArrayList<>(right);
+
+    //     leftCommand.set(
+    //         0,
+    //         PathResolver.findExecutable(
+    //             leftCommand.get(0)
+    //         )
+    //     );
+
+    //     rightCommand.set(
+    //         0,
+    //         PathResolver.findExecutable(
+    //             rightCommand.get(0)
+    //         )
+    //     );
+
+    //     ProcessBuilder leftPB =
+    //         new ProcessBuilder(leftCommand);
+
+    //     ProcessBuilder rightPB =
+    //         new ProcessBuilder(rightCommand);
+
+    //     leftPB.redirectError(
+    //         ProcessBuilder.Redirect.INHERIT
+    //     );
+
+    //     rightPB.redirectError(
+    //         ProcessBuilder.Redirect.INHERIT
+    //     );
+
+    //     rightPB.redirectOutput(
+    //         ProcessBuilder.Redirect.INHERIT
+    //     );
+
+    //     List<Process> processes =
+    //         ProcessBuilder.startPipeline(
+    //             List.of(leftPB, rightPB)
+    //         );
+
+    //     processes.get(
+    //         processes.size() - 1
+    //     ).waitFor();
+    // }
 }
