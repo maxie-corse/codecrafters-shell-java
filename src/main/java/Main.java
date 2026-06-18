@@ -9,6 +9,19 @@ import java.io.FileOutputStream;
 
 public class Main {
 
+    static void ensureErrorFileExists(ParsedCommand cmd) throws Exception {
+
+        if (cmd.stderrFile == null) {
+            return;
+        }
+
+        PrintStream err = getError(cmd);
+
+        if (err != System.err) {
+            err.close();
+        }
+    }
+
     static PrintStream getOutput(ParsedCommand cmd) throws Exception {
         if (cmd.stdoutFile == null) {
             return System.out;
@@ -61,6 +74,7 @@ public class Main {
                 break;
             }
             else if (command.equals("echo")) {
+                ensureErrorFileExists(cmd);
                 PrintStream out = getOutput(cmd);
 
                 for (int i = 1; i < tokens.size(); i++) {
@@ -79,6 +93,7 @@ public class Main {
                 }
             }
             else if (command.equals("type")) {
+                ensureErrorFileExists(cmd);
                 String target = tokens.size() > 1 ? tokens.get(1) : "";
                 if (Builtins.isBuiltin(target)) {
                     PrintStream out = getOutput(cmd);
@@ -103,6 +118,7 @@ public class Main {
                 }
             }
             else if (command.equals("pwd")) {
+                ensureErrorFileExists(cmd);
                 PrintStream out = getOutput(cmd);
 
                 out.println(currentDirectory);
