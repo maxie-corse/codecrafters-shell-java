@@ -114,8 +114,7 @@ public class Main {
                 }
             }
             else if (command.equals("jobs")) {
-                JobManager.reapCompletedJobs();
-                JobManager.printJobs();
+                JobManager.printAndReapJobs();
             }
             else {
                 String executablePath = PathResolver.findExecutable(command);
