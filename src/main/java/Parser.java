@@ -38,6 +38,26 @@ public class Parser {
             }
         }
 
+        if (args.contains("|")) {
+
+            cmd.pipeline = new ArrayList<>();
+
+            List<String> currentCommand = new ArrayList<>();
+
+            for (String arg : args) {
+
+                if (arg.equals("|")) {
+                    cmd.pipeline.add(currentCommand);
+                    currentCommand = new ArrayList<>();
+                }
+                else {
+                    currentCommand.add(arg);
+                }
+            }
+
+            cmd.pipeline.add(currentCommand);
+        }
+
         return cmd;
     }
 }

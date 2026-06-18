@@ -37,6 +37,14 @@ public class Tokenizer {
                             current.append(input.charAt(++i));
                         }
                     }
+                    else if (c == '|') {
+                        if (current.length() > 0) {
+                            tokens.add(current.toString());
+                            current.setLength(0);
+                        }
+
+                        tokens.add("|");
+                    }
                     else {
                         current.append(c);
                     }

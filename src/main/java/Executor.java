@@ -55,4 +55,23 @@ public class Executor {
             process.waitFor();
         }
     }
+
+    public static void executePipeline(ParsedCommand cmd) throws Exception {
+
+        ProcessBuilder leftPB =
+            new ProcessBuilder(cmd.pipeline.get(0));
+
+        ProcessBuilder rightPB =
+            new ProcessBuilder(cmd.pipeline.get(1));
+
+        leftPB.redirectError(ProcessBuilder.Redirect.INHERIT);
+        rightPB.redirectError(ProcessBuilder.Redirect.INHERIT);
+
+        List<Process> processes =
+            ProcessBuilder.startPipeline(
+                List.of(leftPB, rightPB)
+            );
+
+        processes.get(processes.size() - 1).waitFor();
+    }
 }

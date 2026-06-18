@@ -11,6 +11,8 @@ public class ParsedCommand {
 
     public boolean background;
 
+    public List<List<String>> pipeline;
+
     public ParsedCommand(List<String> args) {
         this.args = args;
     }

@@ -117,6 +117,11 @@ public class Main {
                 JobManager.printAndReapJobs();
             }
             else {
+                if (cmd.pipeline != null) {
+                    Executor.executePipeline(cmd);
+                    continue;
+                }
+                
                 String executablePath = PathResolver.findExecutable(command);
 
                 if (executablePath.isEmpty()) {
