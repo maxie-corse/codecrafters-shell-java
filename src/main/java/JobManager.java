@@ -4,10 +4,34 @@ import java.util.List;
 public class JobManager {
     private static final List<Job> jobs = new ArrayList<>();
 
-    private static int nextJobNumber = 1;
-
     public static void addJob(Process process, String command) {
-        jobs.add(new Job(nextJobNumber++, process, command));
+        int jobNumber = getNextJobNumber();
+
+        jobs.add(new Job(jobNumber, process, command));
+    }
+
+    private static int getNextJobNumber() {
+
+        int candidate = 1;
+
+        while (true) {
+
+            boolean used = false;
+
+            for (Job job : jobs) {
+
+                if (job.jobNumber == candidate) {
+                    used = true;
+                    break;
+                }
+            }
+
+            if (!used) {
+                return candidate;
+            }
+
+            candidate++;
+        }
     }
 
     public static List<Job> getJobs() {
