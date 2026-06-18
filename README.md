@@ -1,34 +1,144 @@
-[![progress-banner](https://backend.codecrafters.io/progress/shell/05538ab8-8e6a-4679-8d86-2c8a8541ed13)](https://app.codecrafters.io/users/maxie-corse?r=2qF)
+# Codecrafters Shell (Java)
 
-This is a starting point for Java solutions to the
-["Build Your Own Shell" Challenge](https://app.codecrafters.io/courses/shell/overview).
+A Unix-like shell built from scratch in Java as part of the Codecrafters Shell Challenge.
 
-In this challenge, you'll build your own POSIX compliant shell that's capable of
-interpreting shell commands, running external programs and builtin commands like
-cd, pwd, echo and more. Along the way, you'll learn about shell command parsing,
-REPLs, builtin commands, and more.
+## Features
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+### Command Execution
 
-# Passing the first stage
+* Execute external programs from the system PATH
+* Built-in command support
+* PATH-based executable resolution
 
-The entry point for your `shell` implementation is in `src/main/java/Main.java`.
-Study and uncomment the relevant code, then run the command below to execute the
-tests on our servers:
+### Built-in Commands
 
-```sh
-codecrafters submit
+* `echo`
+* `pwd`
+* `cd`
+* `type`
+* `exit`
+* `jobs`
+
+### Shell Parsing
+
+* Tokenization of command input
+* Single quote support (`'...'`)
+* Double quote support (`"..."`)
+* Escape sequence handling
+* Quoted executable names
+* Argument parsing
+
+### Redirection
+
+#### Standard Output
+
+* `>`
+* `1>`
+* `>>`
+* `1>>`
+
+#### Standard Error
+
+* `2>`
+* `2>>`
+
+### Background Jobs
+
+* Launch commands with `&`
+* Job tracking
+* `jobs` builtin
+* Automatic job reaping
+* Job status updates (`Running`, `Done`)
+* Job number recycling
+
+### Pipelines
+
+* Two-command pipelines
+* Multi-stage pipelines
+* Builtin/external command pipelines
+
+Examples:
+
+```bash
+echo hello | wc
+
+cat file.txt | head -n 5 | wc
+
+sleep 100 &
+
+jobs
+
+echo hello > output.txt
+
+cat input.txt | grep error >> logs.txt
 ```
 
-Time to move on to the next stage!
+## Project Structure
 
-# Stage 2 & beyond
+```text
+src/main/java/
+├── Main.java
+├── Builtins.java
+├── BuiltinExecutor.java
+├── Executor.java
+├── Parser.java
+├── ParsedCommand.java
+├── PathResolver.java
+├── Tokenizer.java
+├── Job.java
+├── JobManager.java
+└── RedirectUtils.java
+```
 
-Note: This section is for stages 2 and beyond.
+## What I Learned
 
-1. Ensure you have `mvn` installed locally
-1. Run `./your_program.sh` to run your program, which is implemented in
-   `src/main/java/Main.java`.
-1. Run `codecrafters submit` to submit your solution to CodeCrafters. Test
-   output will be streamed to your terminal.
+Building this shell involved implementing many concepts commonly used by operating systems and command interpreters:
+
+* Process creation and management
+* Standard input/output/error streams
+* Pipes and inter-process communication
+* Background job control
+* Command parsing and tokenization
+* File descriptor redirection
+* PATH resolution
+* Shell built-ins
+
+## Technologies
+
+* Java
+* Maven
+* ProcessBuilder API
+* Codecrafters Shell Challenge
+
+## Running
+
+```bash
+mvn package
+
+./your_program.sh
+```
+
+## Example Session
+
+```bash
+$ echo hello world
+hello world
+
+$ echo hello > output.txt
+
+$ cat output.txt
+hello
+
+$ sleep 100 &
+[1] 12345
+
+$ jobs
+[1]+ Running                 sleep 100 &
+
+$ cat file.txt | head -n 3 | wc
+       3       3      21
+```
+
+## Status
+
+Work in progress — currently implementing the Codecrafters Shell challenge stages.
