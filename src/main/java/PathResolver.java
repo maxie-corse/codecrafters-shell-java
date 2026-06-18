@@ -1,3 +1,7 @@
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 public class PathResolver {
     static String findExecutable(String command) {
         String pathEnv = System.getenv("PATH");
