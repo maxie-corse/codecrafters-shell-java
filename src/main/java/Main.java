@@ -14,6 +14,8 @@ public class Main {
         Path currentDirectory = Path.of(System.getProperty("user.dir")).toAbsolutePath(), newDirectory;
 
         while (true) {
+            JobManager.reapCompletedJobs();
+
             System.out.print("$ ");
 
             String input = sc.nextLine();
@@ -112,6 +114,7 @@ public class Main {
                 }
             }
             else if (command.equals("jobs")) {
+                JobManager.reapCompletedJobs();
                 JobManager.printJobs();
             }
             else {

@@ -28,16 +28,38 @@ public class JobManager {
                 marker = '-';
             }
 
-            if (!isDone(job)) {
-                System.out.printf(
-                    "[%d]%c  %-24s%s%n",
-                    job.jobNumber,
-                    marker,
-                    "Running",
-                    job.command
-                );
-            }
-            else {
+            System.out.printf(
+                "[%d]%c  %-24s%s%n",
+                job.jobNumber,
+                marker,
+                "Running",
+                job.command
+            );
+        }
+
+        jobs.removeIf(job -> job.doneDisplayed);
+    }
+
+    public static boolean isDone(Job job) {
+        return !job.process.isAlive();
+    }
+
+    public static void reapCompletedJobs() {
+
+        for (int i = 0; i < jobs.size(); i++) {
+
+            Job job = jobs.get(i);
+
+            if (isDone(job)) {
+
+                char marker = ' ';
+
+                if (i == jobs.size() - 1) {
+                    marker = '+';
+                }
+                else if (i == jobs.size() - 2) {
+                    marker = '-';
+                }
 
                 System.out.printf(
                     "[%d]%c  %-24s%s%n",
@@ -52,9 +74,5 @@ public class JobManager {
         }
 
         jobs.removeIf(job -> job.doneDisplayed);
-    }
-
-    public static boolean isDone(Job job) {
-        return !job.process.isAlive();
     }
 }
