@@ -58,14 +58,21 @@ public class Executor {
 
     public static void executePipeline(ParsedCommand cmd) throws Exception {
 
-        ProcessBuilder leftPB =
-            new ProcessBuilder(cmd.pipeline.get(0));
+        List<String> left = new ArrayList<>(cmd.pipeline.get(0));
+        List<String> right = new ArrayList<>(cmd.pipeline.get(1));
 
-        ProcessBuilder rightPB =
-            new ProcessBuilder(cmd.pipeline.get(1));
+        left.set(0, PathResolver.findExecutable(left.get(0)));
+
+        right.set(0, PathResolver.findExecutable(right.get(0)));
+
+        ProcessBuilder leftPB = new ProcessBuilder(left);
+
+        ProcessBuilder rightPB = new ProcessBuilder(right);
 
         leftPB.redirectError(ProcessBuilder.Redirect.INHERIT);
+        
         rightPB.redirectError(ProcessBuilder.Redirect.INHERIT);
+        rightPB.redirectOutput(ProcessBuilder.Redirect.INHERIT);
 
         List<Process> processes =
             ProcessBuilder.startPipeline(
