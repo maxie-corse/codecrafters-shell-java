@@ -9,6 +9,8 @@ public class ParsedCommand {
     public boolean appendStdout;
     public boolean appendStderr;
 
+    public boolean background;
+
     public ParsedCommand(List<String> args) {
         this.args = args;
     }

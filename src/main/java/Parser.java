@@ -11,6 +11,10 @@ public class Parser {
 
             String token = tokens.get(i);
 
+            if (token.equals("&") && i == tokens.size() - 1) {
+                cmd.background = true;
+            }
+
             if (token.equals(">") || token.equals("1>")) {
                 cmd.stdoutFile = tokens.get(++i);
             }

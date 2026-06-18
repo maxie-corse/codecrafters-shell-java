@@ -45,6 +45,13 @@ public class Executor {
         pb.redirectInput(ProcessBuilder.Redirect.INHERIT);
 
         Process process = pb.start();
-        process.waitFor();
+
+        if (cmd.background) {
+            int jobNumber = JobManager.allocateJobNumber();
+            System.out.println("[" + jobNumber + "] " + process.pid());
+        }
+        else {
+            process.waitFor();
+        }
     }
 }
