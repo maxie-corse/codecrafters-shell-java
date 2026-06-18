@@ -23,6 +23,8 @@ public class Main {
             List<String> tokens = Tokenizer.tokenize(input);
 
             ParsedCommand cmd = Parser.parse(tokens);
+            System.out.println(cmd.args);
+            System.out.println(cmd.background);
 
             tokens = cmd.args;
 
@@ -112,7 +114,7 @@ public class Main {
                 }
             }
             else if (command.equals("jobs")) {
-                
+
             }
             else {
                 String executablePath = PathResolver.findExecutable(command);

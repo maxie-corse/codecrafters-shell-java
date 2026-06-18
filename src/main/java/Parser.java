@@ -15,7 +15,7 @@ public class Parser {
                 cmd.background = true;
             }
 
-            if (token.equals(">") || token.equals("1>")) {
+            else if (token.equals(">") || token.equals("1>")) {
                 cmd.stdoutFile = tokens.get(++i);
             }
 
