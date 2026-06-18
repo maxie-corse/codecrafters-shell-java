@@ -23,14 +23,21 @@ public class Main {
             if (input.trim().isEmpty()) continue;
 
             List<String> tokens = Tokenizer.tokenize(input);
+            System.out.println(tokens);
 
             ParsedCommand cmd = Parser.parse(tokens);
+            System.out.println("PIPELINE = " + cmd.pipeline);
 
             tokens = cmd.args;
 
             if (tokens.isEmpty()) continue;
 
             String command = tokens.get(0);
+
+            if (cmd.pipeline != null) {
+                Executor.executePipeline(cmd);
+                continue;
+            }
 
             if (command.equals("exit")) {
                 break;
@@ -117,11 +124,6 @@ public class Main {
                 JobManager.printAndReapJobs();
             }
             else {
-                if (cmd.pipeline != null) {
-                    Executor.executePipeline(cmd);
-                    continue;
-                }
-
                 String executablePath = PathResolver.findExecutable(command);
 
                 if (executablePath.isEmpty()) {
