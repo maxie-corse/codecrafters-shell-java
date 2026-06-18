@@ -5,48 +5,8 @@ import java.nio.file.Path;
 import java.nio.file.Files;
 
 import java.io.PrintStream;
-import java.io.FileOutputStream;
 
 public class Main {
-
-    static void ensureErrorFileExists(ParsedCommand cmd) throws Exception {
-
-        if (cmd.stderrFile == null) {
-            return;
-        }
-
-        PrintStream err = getError(cmd);
-
-        if (err != System.err) {
-            err.close();
-        }
-    }
-
-    static PrintStream getOutput(ParsedCommand cmd) throws Exception {
-        if (cmd.stdoutFile == null) {
-            return System.out;
-        }
-
-        return new PrintStream(
-            new FileOutputStream(
-                cmd.stdoutFile,
-                cmd.appendStdout
-            )
-        );
-    }
-
-    static PrintStream getError(ParsedCommand cmd) throws Exception {
-        if (cmd.stderrFile == null) {
-            return System.err;
-        }
-
-        return new PrintStream(
-            new FileOutputStream(
-                cmd.stderrFile,
-                cmd.appendStderr
-            )
-        );
-    }
 
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
@@ -62,20 +22,20 @@ public class Main {
 
             List<String> tokens = Tokenizer.tokenize(input);
 
-            if (tokens.isEmpty()) continue;
-
             ParsedCommand cmd = Parser.parse(tokens);
 
             tokens = cmd.args;
 
-            String command = cmd.args.get(0);
+            if (tokens.isEmpty()) continue;
+
+            String command = tokens.get(0);
 
             if (command.equals("exit")) {
                 break;
             }
             else if (command.equals("echo")) {
-                ensureErrorFileExists(cmd);
-                PrintStream out = getOutput(cmd);
+                RedirectUtils.ensureErrorFileExists(cmd);
+                PrintStream out = RedirectUtils.getOutput(cmd);
 
                 for (int i = 1; i < tokens.size(); i++) {
 
@@ -93,10 +53,10 @@ public class Main {
                 }
             }
             else if (command.equals("type")) {
-                ensureErrorFileExists(cmd);
+                RedirectUtils.ensureErrorFileExists(cmd);
                 String target = tokens.size() > 1 ? tokens.get(1) : "";
                 if (Builtins.isBuiltin(target)) {
-                    PrintStream out = getOutput(cmd);
+                    PrintStream out = RedirectUtils.getOutput(cmd);
 
                     out.println(target + " is a shell builtin");
 
@@ -106,20 +66,20 @@ public class Main {
                     String executablePath = PathResolver.findExecutable(target);
 
                     if (!executablePath.isEmpty()) {
-                        PrintStream out = getOutput(cmd);
-                        System.out.println(target + " is " + executablePath);
+                        PrintStream out = RedirectUtils.getOutput(cmd);
+                        out.println(target + " is " + executablePath);
                         if (out != System.out) out.close();
                     }
                     else {
-                        PrintStream out = getOutput(cmd);
-                        System.out.println(target + ": not found");
+                        PrintStream out = RedirectUtils.getOutput(cmd);
+                        out.println(target + ": not found");
                         if (out != System.out) out.close();
                     }
                 }
             }
             else if (command.equals("pwd")) {
-                ensureErrorFileExists(cmd);
-                PrintStream out = getOutput(cmd);
+                RedirectUtils.ensureErrorFileExists(cmd);
+                PrintStream out = RedirectUtils.getOutput(cmd);
 
                 out.println(currentDirectory);
 
@@ -144,18 +104,25 @@ public class Main {
                     currentDirectory = newDirectory.toAbsolutePath();
                 }
                 else {
-                    PrintStream err = getError(cmd);
+                    PrintStream err = RedirectUtils.getError(cmd);
 
                     err.println("cd: " + tokens.get(1) + ": No such file or directory");
 
                     if (err != System.err) err.close();
                 }
             }
+            else if (command.equals("jobs")) {
+                
+            }
             else {
                 String executablePath = PathResolver.findExecutable(command);
 
                 if (executablePath.isEmpty()) {
+                    PrintStream err = RedirectUtils.getError(cmd);
                     System.out.println(command + ": command not found");
+                    if (err != System.err) {
+                        err.close();
+                    }
                     continue;
                 }
                 
