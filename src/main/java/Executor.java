@@ -58,8 +58,7 @@ public class Executor {
 
     public static void executePipeline(ParsedCommand cmd) throws Exception {
 
-        List<ProcessBuilder> builders =
-            new ArrayList<>();
+        List<ProcessBuilder> builders = new ArrayList<>();
 
         for (List<String> command : cmd.pipeline) {
 
@@ -77,6 +76,8 @@ public class Executor {
 
             builders.add(pb);
         }
+
+        builders.get(builders.size() - 1).redirectOutput(ProcessBuilder.Redirect.INHERIT);
 
         List<Process> processes =
             ProcessBuilder.startPipeline(builders);
