@@ -23,10 +23,8 @@ public class Main {
             if (input.trim().isEmpty()) continue;
 
             List<String> tokens = Tokenizer.tokenize(input);
-            System.out.println(tokens);
 
             ParsedCommand cmd = Parser.parse(tokens);
-            System.out.println("PIPELINE = " + cmd.pipeline);
 
             tokens = cmd.args;
 
