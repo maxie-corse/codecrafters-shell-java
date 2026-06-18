@@ -1,3 +1,19 @@
 *.jar
+# Maven
 target/
 .idea/
+
+# Java
+*.class
+
+# IntelliJ
+.idea/
+*.iml
+
+# Eclipse
+.settings/
+.project
+.classpath
+
+# VS Code
+.vscode/
